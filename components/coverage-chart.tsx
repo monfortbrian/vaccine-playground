@@ -15,7 +15,7 @@ export function CoverageChart({ coverageDetail }: { coverageDetail: Record<strin
           <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
           <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-20} textAnchor="end" height={60} />
           <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} tickFormatter={v => `${v}%`} />
-          <Tooltip formatter={(v: number) => [`${v}%`]} />
+          <Tooltip formatter={(v: any) => [`${v}%`]} />
           <Legend wrapperStyle={{ fontSize: 12 }} />
           <ReferenceLine y={80} stroke="var(--color-muted-foreground)" strokeDasharray="6 4" label={{ value: "80% target", position: "right", fontSize: 10 }} />
           <Bar dataKey="MHC-I" fill="var(--color-primary)" radius={[2, 2, 0, 0]} barSize={20} />
