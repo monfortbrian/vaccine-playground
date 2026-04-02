@@ -55,10 +55,10 @@ export default function PlaygroundPage() {
     if (!inputValue.trim()) return;
     setError(null); setRunning(true); setPs(null);
     try {
-      const body = { input_type: inputType, input_value: inputValue.trim() } as any;
+      const body: any = { input_type: inputType, input_value: inputValue.trim() };
       if (inputType === "pathogen") body.max_proteins = maxProteins;
       if (inputType === "sequence" && proteinName) body.protein_name = proteinName;
-      const r = await api.startRun(body as Parameters<typeof api.startRun>[0]);
+      const r = await api.startRun(body);
       setPs({ run_id: r.run_id, status: "pending", current_node: null, progress: 0, message: "Pipeline queued...", started_at: null, completed_at: null });
       start(r.run_id);
     } catch (e: unknown) { setError(e instanceof Error ? e.message : "Failed"); setRunning(false); }
