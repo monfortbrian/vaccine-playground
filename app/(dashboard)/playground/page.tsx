@@ -123,11 +123,7 @@ export default function PlaygroundPage() {
               <div className="rounded-full bg-muted p-4 mb-6"><IconFlask className="size-8 text-muted-foreground" /></div>
               <h3 className="text-lg font-semibold">Ready to analyze</h3>
               <p className="text-sm text-muted-foreground mt-2 max-w-sm">Enter a pathogen, UniProt ID, or sequence. The pipeline predicts epitopes, screens for safety, and calculates population coverage.</p>
-              {/* <div className="grid grid-cols-4 gap-8 mt-10">
-                {[{ icon: IconDna, label: "T-Cell" }, { icon: IconMicroscope, label: "B-Cell" }, { icon: IconShield, label: "Safety" }, { icon: IconWorld, label: "Coverage" }].map((s) => (
-                  <div key={s.label} className="flex flex-col items-center gap-2"><div className="rounded-lg bg-muted p-2.5"><s.icon className="size-5 text-muted-foreground" /></div><span className="text-xs text-muted-foreground font-medium">{s.label}</span></div>
-                ))}
-              </div>
+
             </div>
           )}
           {ps && (<Card><CardHeader><div className="flex items-center justify-between"><CardTitle>Pipeline Progress</CardTitle><Badge variant="outline" className="font-mono text-xs">{ps.run_id.slice(0, 8)}</Badge></div></CardHeader><CardContent><PipelineNodes currentNode={ps.current_node} status={ps.status} progress={ps.progress} message={ps.message} /></CardContent></Card>)}
