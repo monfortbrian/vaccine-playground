@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .eq("email", email)
       .single();
 
-    // If not in beta_users OR not granted — show access denied
+    // If not in beta_users OR not granted show access denied
     if (!betaUser || !betaUser.access_granted) {
       throw new Error("ACCESS_DENIED");
     }
