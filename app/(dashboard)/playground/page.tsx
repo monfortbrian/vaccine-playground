@@ -20,6 +20,8 @@ import { PipelineNodes } from "@/components/pipeline-nodes";
 import { api } from "@/lib/api";
 import type { InputType, PipelineStatusResponse } from "@/types";
 
+import { supabase } from '@/lib/supabase';
+
 const INPUT_TYPES: { value: InputType; label: string; desc: string }[] = [
   { value: "pathogen", label: "Pathogen", desc: "Search by name" },
   { value: "uniprot_id", label: "UniProt ID", desc: "Single protein" },
@@ -74,6 +76,7 @@ export default function PlaygroundPage() {
       const body: any = { input_type: inputType, input_value: inputValue.trim() };
       if (inputType === "pathogen") body.max_proteins = maxProteins;
       if (inputType === "sequence" && proteinName) body.protein_name = proteinName;
+      const { data: { session } } = await supabase.auth.getSession();
       const r = await api.startRun(body);
       setRunId(r.run_id);
       setPs({
@@ -140,8 +143,8 @@ export default function PlaygroundPage() {
                     onClick={() => { setInputType(t.value); setInputValue(""); }}
                     disabled={running}
                     className={`flex flex-col items-center gap-1 rounded-lg border-2 px-3 py-3 text-center transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${inputType === t.value
-                        ? "border-primary bg-primary/5 text-primary"
-                        : "border-muted bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                      ? "border-primary bg-primary/5 text-primary"
+                      : "border-muted bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                       }`}>
                     <span className="text-xs font-semibold">{t.label}</span>
                     <span className="text-[10px] leading-tight opacity-70">{t.desc}</span>
