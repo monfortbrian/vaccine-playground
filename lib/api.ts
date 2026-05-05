@@ -9,31 +9,24 @@ import { supabase } from '@/lib/supabase';
 
 const API = process.env.NEXT_PUBLIC_API_URL || '';
 
-async function getAuthHeaders(): Promise<Record<string, string>> {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  try {
-    const { data: { session }, error } = await supabase.auth.getSession();
-
-    if (error || !session?.access_token) {
-      // Session missing or stale — try a refresh before giving up
-      const { data: refreshed } = await supabase.auth.refreshSession();
-      if (refreshed.session?.access_token) {
-        headers['Authorization'] = `Bearer ${refreshed.session.access_token}`;
-      }
-    } else {
-      headers['Authorization'] = `Bearer ${session.access_token}`;
-    }
-  } catch {}
-  return headers;
+async function getToken(): Promise<string | null> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session?.access_token) return session.access_token;
+  // Session stale — force refresh
+  const { data: refreshed } = await supabase.auth.refreshSession();
+  return refreshed.session?.access_token ?? null;
 }
 
 async function f<T>(url: string, opts?: RequestInit): Promise<T> {
-  const headers = await getAuthHeaders();
+  const token = await getToken();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
   try {
     const r = await fetch(url, {
       ...opts,
-      // Auth headers win — opts.headers never overwrites Authorization
-      headers: { ...headers, ...(opts?.headers as Record<string, string> || {}) },
+      headers,
     });
     if (!r.ok) throw new Error(`API returned ${r.status}: ${await r.text()}`);
     return r.json();
