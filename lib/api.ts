@@ -12,7 +12,7 @@ const API = process.env.NEXT_PUBLIC_API_URL || '';
 async function getToken(): Promise<string | null> {
   const { data: { session } } = await supabase.auth.getSession();
   if (session?.access_token) return session.access_token;
-  // Session stale — force refresh
+  // Session stale - force refresh
   const { data: refreshed } = await supabase.auth.refreshSession();
   return refreshed.session?.access_token ?? null;
 }

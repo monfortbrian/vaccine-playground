@@ -1,4 +1,4 @@
-// types/index.ts — full replacement
+// types/index.ts - full replacement
 // Changes from previous version:
 //   - PipelineNode: added 'N5' | 'N8'
 //   - PIPELINE_NODES: added N5 and N8 entries
@@ -171,7 +171,7 @@ export interface NodeInfo {
   tool: string;  // primary tool/source for this node
 }
 
-// N5 and N8 added — order matches pipeline execution
+// N5 and N8 added - order matches pipeline execution
 export const PIPELINE_NODES: NodeInfo[] = [
   {
     id: "N1",
