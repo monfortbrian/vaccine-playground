@@ -38,7 +38,7 @@ export default function HistoryPage() {
           <h2 className="text-2xl font-bold tracking-tight">Projects</h2>
           <p className="text-muted-foreground">Organize runs by research projects</p>
         </div>
-        <Button onClick={() => router.push("/playground")}>
+        <Button onClick={() => router.push("/")}>
           <IconPlus className="mr-2 size-4" />New Project
         </Button>
       </div>

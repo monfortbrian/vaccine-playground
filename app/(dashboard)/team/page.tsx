@@ -38,7 +38,7 @@ export default function HistoryPage() {
           <h2 className="text-2xl font-bold tracking-tight">Team</h2>
           <p className="text-muted-foreground">Manage lab members and their permissions</p>
         </div>
-        <Button onClick={() => router.push("/playground")}>
+        <Button onClick={() => router.push("/")}>
           <IconPlus className="mr-2 size-4" />Invite Member
         </Button>
       </div>

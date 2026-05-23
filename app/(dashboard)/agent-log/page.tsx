@@ -38,7 +38,7 @@ export default function HistoryPage() {
           <h2 className="text-2xl font-bold tracking-tight">Agent Log</h2>
           <p className="text-muted-foreground">Monitor and manage agent activities</p>
         </div>
-        <Button onClick={() => router.push("/playground")}>
+        <Button onClick={() => router.push("/")}>
           <IconLoader className="mr-2 size-4" />Re-run Agents
         </Button>
       </div>
