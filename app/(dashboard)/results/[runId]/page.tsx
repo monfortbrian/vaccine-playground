@@ -82,7 +82,7 @@ export default function ResultsPage() {
             variant='outline'
 
             onClick={() =>
-              downloadCSV(res.candidates, `kozi-${runId.slice(0, 8)}.csv`)
+              downloadCSV(res.candidates, `TOP_DEEP-${runId.slice(0, 8)}.csv`)
             }
           >
             <IconDownload className="size-3" /> CSV
@@ -90,7 +90,7 @@ export default function ResultsPage() {
           <Button
             variant='outline'
 
-            onClick={() => downloadJSON(res, `kozi-${runId.slice(0, 8)}.json`)}
+            onClick={() => downloadJSON(res, `TOP_DEEP-${runId.slice(0, 8)}.json`)}
           >
             <IconDownload className="size-3" />JSON
           </Button>
