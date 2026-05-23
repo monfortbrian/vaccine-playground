@@ -73,7 +73,7 @@ function DownloadMenu({ runId }: { runId: string }) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `kozi-${runId.slice(0, 8)}.json`;
+        a.download = `TOP_DEEP-${runId.slice(0, 8)}.json`;
         a.click();
         URL.revokeObjectURL(url);
       } else {
@@ -86,7 +86,7 @@ function DownloadMenu({ runId }: { runId: string }) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `kozi-${runId.slice(0, 8)}.csv`;
+        a.download = `TOP_DEEP-${runId.slice(0, 8)}.csv`;
         a.click();
         URL.revokeObjectURL(url);
       }
