@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * ConstructCard — N8 Construct Designer result display
+ * ConstructCard - N8 Construct Designer result display
  *
  * Renders:
  *   - Full construct sequence with copy button
@@ -128,34 +128,34 @@ function PhyschemGrid({ props }: { props: Physicochemical }) {
       value:
         props.molecular_weight_da != null
           ? `${(props.molecular_weight_da / 1000).toFixed(2)} kDa`
-          : "—",
+          : "-",
       note: "Theoretical",
     },
     {
       label: "Isoelectric point (pI)",
       value: props.isoelectric_point != null
         ? props.isoelectric_point.toFixed(2)
-        : "—",
+        : "-",
       note: "±0.3 pH units typical error",
     },
     {
       label: "Instability index",
       value: props.instability_index != null
         ? props.instability_index.toFixed(2)
-        : "—",
+        : "-",
       note: props.is_stable != null
-        ? (props.is_stable ? "Predicted stable (<40)" : "Predicted unstable (≥40) — review required")
+        ? (props.is_stable ? "Predicted stable (<40)" : "Predicted unstable (≥40) - review required")
         : "",
       highlight: props.is_stable === false ? "warning" : undefined,
     },
     {
       label: "GRAVY score",
-      value: props.gravy != null ? props.gravy.toFixed(4) : "—",
+      value: props.gravy != null ? props.gravy.toFixed(4) : "-",
       note: props.hydrophilicity ?? "",
     },
     {
       label: "Aromaticity",
-      value: props.aromaticity != null ? props.aromaticity.toFixed(4) : "—",
+      value: props.aromaticity != null ? props.aromaticity.toFixed(4) : "-",
       note: "Phe + Trp + Tyr fraction",
     },
   ];
@@ -165,11 +165,10 @@ function PhyschemGrid({ props }: { props: Physicochemical }) {
       {metrics.map((m) => (
         <div
           key={m.label}
-          className={`rounded-md border p-3 space-y-0.5 ${
-            m.highlight === "warning"
+          className={`rounded-md border p-3 space-y-0.5 ${m.highlight === "warning"
               ? "border-yellow-500/40 bg-yellow-500/5"
               : "bg-card"
-          }`}
+            }`}
         >
           <p className="text-xs text-muted-foreground">{m.label}</p>
           <p className="text-lg font-semibold font-mono tabular-nums">
@@ -177,11 +176,10 @@ function PhyschemGrid({ props }: { props: Physicochemical }) {
           </p>
           {m.note && (
             <p
-              className={`text-[10px] leading-snug ${
-                m.highlight === "warning"
+              className={`text-[10px] leading-snug ${m.highlight === "warning"
                   ? "text-yellow-600 dark:text-yellow-400"
                   : "text-muted-foreground"
-              }`}
+                }`}
             >
               {m.note}
             </p>
@@ -277,7 +275,7 @@ export function ConstructCard({
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">N8 — Construct Designer</CardTitle>
+          <CardTitle className="text-base">N8 - Construct Designer</CardTitle>
           <CardDescription>
             No construct was produced. This occurs when no safety-passed,
             confidence-scored epitopes remain after N6 filtering. Review N6
@@ -294,7 +292,7 @@ export function ConstructCard({
         <div className="flex items-start justify-between gap-4">
           <div>
             <CardTitle className="text-base">
-              N8 — Multi-Epitope Construct
+              N8 - Multi-Epitope Construct
             </CardTitle>
             <CardDescription className="mt-1">
               Assembled from safety-passed, high-confidence epitopes. All
@@ -362,15 +360,15 @@ export function ConstructCard({
           reference={report.linker_reference}
         />
 
-        {/* Limitations — always visible, non-collapsible */}
+        {/* Limitations - always visible, non-collapsible */}
         <div className="rounded-md border border-yellow-500/30 bg-yellow-500/5 p-4 space-y-2">
           <p className="text-xs font-semibold text-yellow-700 dark:text-yellow-400 uppercase tracking-wider">
-            Limitations — read before use
+            Limitations - read before use
           </p>
           <ul className="space-y-1">
             {report.limitations.map((l, i) => (
               <li key={i} className="flex gap-2 text-xs text-muted-foreground">
-                <span className="text-yellow-500 shrink-0 mt-0.5">—</span>
+                <span className="text-yellow-500 shrink-0 mt-0.5">-</span>
                 <span>{l}</span>
               </li>
             ))}

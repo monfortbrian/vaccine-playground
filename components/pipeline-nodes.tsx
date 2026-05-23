@@ -1,54 +1,27 @@
 "use client";
 
 /**
- * PipelineNodes — real-time N1→N8 pipeline progress visualisation
+ * PipelineNodes - N1→N8 progress visualisation
  *
- * Node states:
- *   waiting  — not yet reached
- *   running  — currently active (spinning loader)
- *   done     — completed
- *   error    — failed at this node
- *
- * Uses lucide-react Loader2 for the active spinner per design direction.
+ * Design decisions:
+ *   - Node label is "N1", "N2" etc - not icons (per product direction)
+ *   - Active node: solid border + Loader2 spinner (lucide)
+ *   - Done node: check mark, reduced opacity
+ *   - Waiting: low opacity, no decoration
+ *   - Error: destructive ring
+ *   - No blue - neutral palette only
+ *   - Progress message: professional copy, not "Running TOPE_DEEP N1 → N8."
  */
 
 import React from "react";
 import { cn } from "@/lib/utils";
 import { PIPELINE_NODES, type PipelineNode } from "@/types";
 import { Progress } from "@/components/ui/progress";
-import {
-  Database,
-  Filter,
-  Dna,
-  Microscope,
-  Boxes,
-  ShieldCheck,
-  Globe2,
-  FlaskConical,
-  Check,
-  Loader2,
-  Clock,
-  AlertTriangle,
-} from "lucide-react";
-
-// ── Icon map ──────────────────────────────────────────────────────────────────
-
-const NODE_ICONS: Record<PipelineNode, React.ElementType> = {
-  N1: Database,
-  N2: Filter,
-  N3: Dna,
-  N4: Microscope,
-  N5: Boxes,       // 3D structure — Boxes evokes spatial/volume
-  N6: ShieldCheck,
-  N7: Globe2,
-  N8: FlaskConical,
-};
-
-// ── State resolution ──────────────────────────────────────────────────────────
-
-type NodeState = "waiting" | "running" | "done" | "error";
+import { Check, Loader2, Clock, AlertTriangle } from "lucide-react";
 
 const NODE_ORDER: PipelineNode[] = ["N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8"];
+
+type NodeState = "waiting" | "running" | "done" | "error";
 
 function resolveState(
   nodeId: PipelineNode,
@@ -57,132 +30,113 @@ function resolveState(
 ): NodeState {
   if (pipelineStatus === "failed" && nodeId === currentNode) return "error";
   if (pipelineStatus === "completed") return "done";
-
-  const currentIdx = currentNode ? NODE_ORDER.indexOf(currentNode) : -1;
-  const nodeIdx = NODE_ORDER.indexOf(nodeId);
-
-  if (nodeIdx < currentIdx) return "done";
-  if (nodeIdx === currentIdx) return "running";
+  const ci = currentNode ? NODE_ORDER.indexOf(currentNode) : -1;
+  const ni = NODE_ORDER.indexOf(nodeId);
+  if (ni < ci) return "done";
+  if (ni === ci) return "running";
   return "waiting";
 }
 
-// ── Status icon ───────────────────────────────────────────────────────────────
-
-function StatusIcon({ state }: { state: NodeState }) {
-  switch (state) {
-    case "done":
-      return <Check className="size-3 text-primary" strokeWidth={2.5} />;
-    case "running":
-      return <Loader2 className="size-3 text-primary animate-spin" />;
-    case "error":
-      return <AlertTriangle className="size-3 text-destructive" />;
-    default:
-      return <Clock className="size-3 text-muted-foreground/30" />;
-  }
+function progressMessage(
+  currentNode: PipelineNode | null,
+  status: string,
+  message: string
+): string {
+  if (status === "paused") return "Analysis paused.";
+  if (status === "cancelled") return "Analysis stopped.";
+  if (status === "completed") return "Analysis complete.";
+  if (status === "failed") return message || "Pipeline encountered an error.";
+  if (!currentNode) return "Initializing…";
+  // Professional per-node messages
+  const msgs: Record<PipelineNode, string> = {
+    N1: "Fetching protein sequences from UniProt…",
+    N2: "Screening surface-exposed antigens (VaxiJen, Phobius)…",
+    N3: "Predicting T-cell epitopes (NetMHCpan 4.1, NetMHCIIpan 4.3)…",
+    N4: "Predicting B-cell epitopes (IEDB BepiPred 2.0)…",
+    N5: "Retrieving 3D structures (AlphaFold DB)…",
+    N6: "Safety screening (AllerTOP, AllergenFP, ToxinPred, BLAST)…",
+    N7: "Calculating population coverage (IEDB, AFND 2020)…",
+    N8: "Assembling multi-epitope construct (ProtParam)…",
+  };
+  return msgs[currentNode] || message || "Processing…";
 }
 
-// ── Single node card ──────────────────────────────────────────────────────────
+// ── Single node pill ──────────────────────────────────────────────────────────
 
-interface NodeCardProps {
+function NodePill({
+  node,
+  state,
+}: {
   node: (typeof PIPELINE_NODES)[number];
   state: NodeState;
-}
-
-function NodeCard({ node, state }: NodeCardProps) {
-  const Icon = NODE_ICONS[node.id];
-
+}) {
   return (
     <div
       className={cn(
-        "relative rounded-xl border p-3 transition-all duration-300",
-        // Base
-        "bg-card",
-        // State variants
-        state === "running" && [
-          "border-primary/40",
-          "shadow-[0_0_0_3px_rgba(0,113,227,0.12)]",
-          "dark:shadow-[0_0_0_3px_rgba(10,132,255,0.15)]",
-        ],
-        state === "done" && "border-border opacity-60",
-        state === "waiting" && "border-border opacity-35",
-        state === "error" && [
-          "border-destructive/40",
-          "shadow-[0_0_0_3px_rgba(255,59,48,0.1)]",
-        ]
+        "flex flex-col items-center gap-2 min-w-0",
+        state === "waiting" && "opacity-30",
+        state === "done" && "opacity-50",
       )}
     >
-      {/* Icon + status indicator */}
-      <div className="flex items-center justify-between mb-2.5">
-        <div
-          className={cn(
-            "rounded-md p-1.5 transition-colors duration-200",
-            state === "running" || state === "done"
-              ? "bg-primary/10 dark:bg-primary/15"
+      {/* Circle */}
+      <div
+        className={cn(
+          "relative flex size-9 items-center justify-center rounded-full border-2 transition-all duration-300",
+          state === "running"
+            ? "border-foreground bg-foreground text-background shadow-sm"
+            : state === "done"
+              ? "border-foreground/40 bg-transparent text-foreground"
               : state === "error"
-              ? "bg-destructive/10"
-              : "bg-muted"
-          )}
-        >
-          <Icon
-            className={cn(
-              "size-3.5",
-              state === "running" || state === "done"
-                ? "text-primary"
-                : state === "error"
-                ? "text-destructive"
-                : "text-muted-foreground"
-            )}
-          />
-        </div>
-        <StatusIcon state={state} />
+                ? "border-destructive bg-destructive/10 text-destructive"
+                : "border-border bg-transparent text-muted-foreground",
+        )}
+      >
+        {state === "running" ? (
+          <Loader2 className="size-3.5 animate-spin" />
+        ) : state === "done" ? (
+          <Check className="size-3.5" strokeWidth={2.5} />
+        ) : state === "error" ? (
+          <AlertTriangle className="size-3 " />
+        ) : (
+          <span className="font-mono text-[10px] font-semibold leading-none">
+            {node.id}
+          </span>
+        )}
+
+        {/* Active pulse ring */}
+        {state === "running" && (
+          <span className="absolute inset-0 rounded-full border-2 border-foreground/20 animate-ping" />
+        )}
       </div>
 
-      {/* Node ID badge */}
-      <p
-        className={cn(
-          "font-mono text-[10px] font-semibold mb-0.5 tracking-wide",
-          state === "running" ? "text-primary" : "text-muted-foreground"
-        )}
-      >
-        {node.id}
-      </p>
-
       {/* Label */}
-      <p
-        className={cn(
-          "text-xs font-semibold leading-tight",
-          state === "waiting" && "text-muted-foreground"
-        )}
-      >
-        {node.label}
-      </p>
-
-      {/* Short description */}
-      <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight">
-        {node.shortDesc}
-      </p>
-
-      {/* Tool source — only shown when running or done */}
-      {(state === "running" || state === "done") && (
+      <div className="text-center">
         <p
           className={cn(
-            "text-[9px] mt-1.5 leading-tight font-mono",
-            state === "running"
-              ? "text-primary/60"
-              : "text-muted-foreground/50"
+            "font-mono text-[10px] font-semibold leading-tight",
+            state === "running" ? "text-foreground" : "text-muted-foreground",
           )}
         >
-          {node.tool}
+          {state !== "running" ? node.id : node.id}
         </p>
-      )}
-
-      {/* Active pulse bar */}
-      {state === "running" && (
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 rounded-b-xl overflow-hidden">
-          <div className="h-full bg-primary/40 animate-pulse" />
-        </div>
-      )}
+        <p className="text-[9px] text-muted-foreground leading-tight mt-0.5 max-w-[72px] truncate">
+          {node.shortDesc}
+        </p>
+      </div>
     </div>
+  );
+}
+
+// ── Connector line between nodes ──────────────────────────────────────────────
+
+function Connector({ done }: { done: boolean }) {
+  return (
+    <div
+      className={cn(
+        "h-px flex-1 mt-4 transition-all duration-500",
+        done ? "bg-foreground/30" : "bg-border",
+      )}
+    />
   );
 }
 
@@ -202,24 +156,29 @@ export function PipelineNodes({
   message,
 }: PipelineNodesProps) {
   return (
-    <div className="space-y-5">
-      {/* Node grid — 4 cols on desktop, 2 on mobile */}
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8">
-        {PIPELINE_NODES.map((node) => {
+    <div className="space-y-6">
+      {/* Node row with connectors */}
+      <div className="flex items-start gap-0">
+        {PIPELINE_NODES.map((node, i) => {
           const state = resolveState(node.id, currentNode, status);
-          return <NodeCard key={node.id} node={node} state={state} />;
+          const prevDone = i > 0
+            ? resolveState(PIPELINE_NODES[i - 1].id, currentNode, status) === "done"
+            : false;
+          return (
+            <React.Fragment key={node.id}>
+              {i > 0 && <Connector done={prevDone} />}
+              <NodePill node={node} state={state} />
+            </React.Fragment>
+          );
         })}
       </div>
 
-      {/* Progress bar + message */}
-      <div className="space-y-2 pt-1">
-        <Progress
-          value={progress * 100}
-          className="h-1.5"
-        />
+      {/* Progress */}
+      <div className="space-y-2">
+        <Progress value={progress * 100} className="h-1" />
         <div className="flex items-center justify-between">
           <p className="text-xs text-muted-foreground leading-relaxed">
-            {message || "Initializing…"}
+            {progressMessage(currentNode, status, message)}
           </p>
           <p className="font-mono text-xs tabular-nums text-muted-foreground">
             {Math.round(progress * 100)}%
@@ -230,27 +189,26 @@ export function PipelineNodes({
   );
 }
 
-// ── Empty state node icons (for playground idle state) ───────────────────────
+// ── Idle grid - shown before any run starts ───────────────────────────────────
 
 export function PipelineIdleGrid() {
   return (
-    <div className="grid grid-cols-4 gap-3 sm:grid-cols-8">
-      {PIPELINE_NODES.map((node) => {
-        const Icon = NODE_ICONS[node.id];
-        return (
-          <div
-            key={node.id}
-            className="flex flex-col items-center gap-1.5"
-          >
-            <div className="rounded-lg bg-muted p-2">
-              <Icon className="size-4 text-muted-foreground/50" />
+    <div className="flex items-start justify-center gap-0 opacity-40">
+      {PIPELINE_NODES.map((node, i) => (
+        <React.Fragment key={node.id}>
+          {i > 0 && <div className="h-px w-6 mt-4 bg-border" />}
+          <div className="flex flex-col items-center gap-1.5">
+            <div className="flex size-8 items-center justify-center rounded-full border border-border">
+              <span className="font-mono text-[10px] font-semibold text-muted-foreground">
+                {node.id}
+              </span>
             </div>
-            <span className="font-mono text-[9px] text-muted-foreground/50">
-              {node.id}
+            <span className="font-mono text-[9px] text-muted-foreground">
+              {node.shortDesc}
             </span>
           </div>
-        );
-      })}
+        </React.Fragment>
+      ))}
     </div>
   );
 }

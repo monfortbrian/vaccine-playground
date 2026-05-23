@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * StructureCard — N5 Structure Retrieval result display
+ * StructureCard - N5 Structure Retrieval result display
  *
  * Shows AlphaFold DB hit/miss per candidate protein.
  * pLDDT confidence bands:
@@ -167,7 +167,7 @@ function StructureEntry({ candidate }: { candidate: Candidate }) {
         <div className="space-y-2">
           <p className="text-xs text-muted-foreground leading-relaxed">
             {decision.decision === "skipped"
-              ? "Non-UniProt accession — AlphaFold lookup not applicable."
+              ? "Non-UniProt accession - AlphaFold lookup not applicable."
               : "No entry in AlphaFold DB for this accession. Conformational B-cell epitope accuracy is reduced; linear sequence only was used."}
           </p>
           {decision.colabfold_hint && (
@@ -212,7 +212,7 @@ export function StructureCard({ candidates }: { candidates: Candidate[] }) {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-base">
-              N5 — 3D Structure Retrieval
+              N5 - 3D Structure Retrieval
             </CardTitle>
             <CardDescription className="mt-1">
               AlphaFold DB lookup by UniProt accession. pLDDT scores indicate
@@ -231,7 +231,7 @@ export function StructureCard({ candidates }: { candidates: Candidate[] }) {
 
         <p className="text-[10px] text-muted-foreground pt-1">
           Source: AlphaFold Protein Structure Database (EBI/DeepMind).
-          Structures are computational predictions — not experimentally
+          Structures are computational predictions - not experimentally
           determined. For crystallographic or cryo-EM data, cross-reference
           with PDB (rcsb.org).
         </p>
