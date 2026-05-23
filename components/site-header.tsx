@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 
 const titles: Record<string, string> = {
-  "/playground": "Playground",
+  "/": "Playground",
   "/history": "Run History",
   "/settings": "Settings",
 }

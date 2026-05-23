@@ -35,7 +35,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 
 const navMain = [
-  { title: "Playground", url: "/playground", icon: IconPlayerPlay },
+  { title: "Playground", url: "/", icon: IconPlayerPlay },
   { title: "Run History", url: "/history", icon: IconHistoryToggle },
   { title: "Projects", url: "/projects", icon: IconListDetails, soon: true },
   { title: "Team", url: "/team", icon: IconUsersGroup, soon: true },
@@ -64,7 +64,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               className="data-[slot=sidebar-menu-button]:!p-1.5"
-              onClick={() => window.location.href = "/playground"}
+              onClick={() => window.location.href = "/"}
             >
               <IconFlask className="!size-5" />
               <span className="text-base font-semibold">Kozi AI</span>
