@@ -14,7 +14,7 @@ import { AccessDeniedModal } from "@/components/access-denied-modal";
 
 function CoverPanel() {
   return (
-    <div className="relative hidden lg:flex items-center justify-center bg-[#111113] p-8">
+    <div className="relative hidden lg:flex items-center justify-center p-4">
       {/* Floating image with shadow and radius */}
       <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
         <img
@@ -99,8 +99,8 @@ function LoginForm() {
 
           {/* Top bar */}
           <div className="flex items-center gap-2.5 px-8 pt-8">
-            <div className="flex size-7 items-center justify-center rounded-lg bg-foreground">
-              <IconFlask className="size-4 text-background" />
+            <div className="flex h-7 w-8 items-center justify-center rounded-md bg-foreground">
+              <img src="/kozi-ai_emblem_dark.svg" alt="Kozi AI" className="size-4" />
             </div>
             <span className="text-sm font-semibold tracking-tight">Kozi AI</span>
           </div>
@@ -111,7 +111,7 @@ function LoginForm() {
 
               <div className="space-y-1.5">
                 <h1 className="text-2xl font-semibold tracking-tight">
-                  Access Kozi Lab
+                  Access TOP_DEEP
                 </h1>
                 <p className="text-sm text-muted-foreground">
                   Sign in with your lab credentials.
