@@ -35,7 +35,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 
 const navMain = [
-  { title: "Playground", url: "/", icon: IconPlayerPlay },
+  { title: "Playground", url: "/playground", icon: IconPlayerPlay },
   { title: "Run History", url: "/history", icon: IconHistoryToggle },
   { title: "Projects", url: "/projects", icon: IconListDetails, soon: true },
   { title: "Team", url: "/team", icon: IconUsersGroup, soon: true },

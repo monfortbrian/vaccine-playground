@@ -14,21 +14,27 @@ import { AccessDeniedModal } from "@/components/access-denied-modal";
 
 function CoverPanel() {
   return (
-    <div className="relative hidden lg:block">
-      {/* public/ files are served from / in Next.js -never use ../../public/ */}
-      <img
-        src="/alphaFold_illustration.jpeg"
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover"
-        onError={(e) => {
-          (e.target as HTMLImageElement).style.display = "none";
-        }}
-      />
-      <div className="absolute inset-0 bg-black/40" />
-      <div className="absolute bottom-10 left-10 z-10 space-y-1">
-        <p className="text-sm font-medium text-white/70 leading-relaxed">
-          Orchestrating the future of rapid vaccine discovery.
-        </p>
+    <div className="relative hidden lg:flex items-center justify-center bg-[#111113] p-8">
+      {/* Floating image with shadow and radius */}
+      <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
+        <img
+          src="/alphaFold_illustration.jpeg"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          onError={(e) => {
+            (e.target as HTMLImageElement).style.display = "none";
+          }}
+        />
+        {/* Top gradient - fades image into dark bg */}
+        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent" />
+        {/* Bottom overlay for text */}
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/70 to-transparent" />
+        {/* Caption */}
+        <div className="absolute bottom-8 left-8 z-10 space-y-1">
+          <p className="text-sm font-medium text-white/80 leading-relaxed">
+            Orchestrating the future of rapid vaccine discovery.
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -50,13 +56,9 @@ function LoginForm() {
 
   const sessionExpired = searchParams.get("reason") === "expired";
 
-  // Single redirect point -fires once when auth-provider confirms user.
-  // Do NOT also redirect inside handleSubmit. Doing both causes the blink:
-  // handleSubmit pushes to "/" before Supabase onAuthStateChange fires,
-  // dashboard layout sees user=null, redirects back to /login, then
-  // auth resolves and this useEffect fires again -infinite loop.
+
   React.useEffect(() => {
-    if (user) router.replace("/");
+    if (user) router.replace("/playground");
   }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -121,7 +123,7 @@ function LoginForm() {
                 <div className="flex items-start gap-3 rounded-xl border bg-muted/40 px-4 py-3">
                   <AlertCircle className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Your session ended. Pipeline results are preserved -find
+                    Your session ended. Pipeline results are preserved - find
                     them in History after signing in.
                   </p>
                 </div>
