@@ -10,30 +10,25 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/components/auth-provider";
 import { AccessDeniedModal } from "@/components/access-denied-modal";
 
-// ── Left panel -image cover ──────────────────────────────────────────────────
+// ── Right panel -image cover ─────────────────────────────────────────────────
 
 function CoverPanel() {
   return (
     <div className="relative hidden lg:block">
-
+      {/* public/ files are served from / in Next.js -never use ../../public/ */}
       <img
-        src="../../public/alphaFold_illustration.jpeg"
+        src="/alphaFold_illustration.jpeg"
         alt=""
         className="absolute inset-0 h-full w-full object-cover"
         onError={(e) => {
-          // Fallback to dark panel if image missing
           (e.target as HTMLImageElement).style.display = "none";
         }}
       />
-      {/* Dark overlay so any text or logo on top is legible */}
       <div className="absolute inset-0 bg-black/40" />
-
-      {/* Wordmark over image */}
       <div className="absolute bottom-10 left-10 z-10 space-y-1">
         <p className="text-sm font-medium text-white/70 leading-relaxed">
           Orchestrating the future of rapid vaccine discovery.
         </p>
-
       </div>
     </div>
   );
@@ -55,7 +50,11 @@ function LoginForm() {
 
   const sessionExpired = searchParams.get("reason") === "expired";
 
-  // router.replace -not push -avoids adding to history stack, eliminates blink
+  // Single redirect point -fires once when auth-provider confirms user.
+  // Do NOT also redirect inside handleSubmit. Doing both causes the blink:
+  // handleSubmit pushes to "/" before Supabase onAuthStateChange fires,
+  // dashboard layout sees user=null, redirects back to /login, then
+  // auth resolves and this useEffect fires again -infinite loop.
   React.useEffect(() => {
     if (user) router.replace("/");
   }, [user, router]);
@@ -67,7 +66,9 @@ function LoginForm() {
     setLoading(true);
     try {
       await signIn(email, password);
-      router.replace("/");   // replace not push
+      // Do NOT call router.replace here.
+      // signIn() triggers Supabase onAuthStateChange → auth-provider sets user
+      // → useEffect above fires → router.replace("/") runs cleanly.
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Sign in failed";
       if (msg === "ACCESS_DENIED") {
@@ -88,13 +89,11 @@ function LoginForm() {
         <AccessDeniedModal onClose={() => setShowAccessDenied(false)} />
       )}
 
+      {/* Two-column grid: form left, image right */}
       <div className="flex min-h-svh lg:grid lg:grid-cols-2">
 
-        {/* ── Left: image cover ───────────────────────────── */}
+        {/* ── Left: form ──────────────────────────────────── */}
         <div className="flex flex-col bg-background">
-
-          {/* ── Right: form ─────────────────────────────────── */}
-          <CoverPanel />
 
           {/* Top bar */}
           <div className="flex items-center gap-2.5 px-8 pt-8">
@@ -259,6 +258,10 @@ function LoginForm() {
             </p>
           </div>
         </div>
+
+        {/* ── Right: image cover ───────────────────────────── */}
+        <CoverPanel />
+
       </div>
     </>
   );
