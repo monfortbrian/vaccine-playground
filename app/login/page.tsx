@@ -15,9 +15,9 @@ import { AccessDeniedModal } from "@/components/access-denied-modal";
 function CoverPanel() {
   return (
     <div className="relative hidden lg:block">
-      {/* Replace /login-cover.jpg with your actual image in public/ */}
+
       <img
-        src="/login-cover.jpg"
+        src="../../public/alphaFold_illustration.jpeg"
         alt=""
         className="absolute inset-0 h-full w-full object-cover"
         onError={(e) => {
@@ -31,11 +31,9 @@ function CoverPanel() {
       {/* Wordmark over image */}
       <div className="absolute bottom-10 left-10 z-10 space-y-1">
         <p className="text-sm font-medium text-white/70 leading-relaxed">
-          Pathogen proteome to ranked vaccine candidates.
+          Orchestrating the future of rapid vaccine discovery.
         </p>
-        <p className="text-xs text-white/30 font-mono">
-          N1 → N8 · UniProt · AlphaFold · IEDB · NetMHCpan
-        </p>
+
       </div>
     </div>
   );
@@ -93,10 +91,10 @@ function LoginForm() {
       <div className="flex min-h-svh lg:grid lg:grid-cols-2">
 
         {/* ── Left: image cover ───────────────────────────── */}
-        <CoverPanel />
-
-        {/* ── Right: form ─────────────────────────────────── */}
         <div className="flex flex-col bg-background">
+
+          {/* ── Right: form ─────────────────────────────────── */}
+          <CoverPanel />
 
           {/* Top bar */}
           <div className="flex items-center gap-2.5 px-8 pt-8">

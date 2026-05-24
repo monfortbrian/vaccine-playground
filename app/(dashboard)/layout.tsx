@@ -17,19 +17,18 @@ export default function DashboardLayout({
   const router = useRouter();
 
   useEffect(() => {
-    // router.replace — not push — no history entry, no back-button loop
     if (!loading && !user) router.replace("/login");
   }, [user, loading, router]);
 
-  if (loading) {
+  // Show spinner while auth resolves OR while waiting for redirect
+  // Never render dashboard children until user is confirmed
+  if (loading || !user) {
     return (
       <div className="flex min-h-svh items-center justify-center">
         <div className="h-5 w-5 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
       </div>
     );
   }
-
-  if (!user) return null;
 
   return (
     <SidebarProvider
