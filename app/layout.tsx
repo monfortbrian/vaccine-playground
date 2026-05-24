@@ -9,7 +9,7 @@ const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
 const jetMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "TOPE_DEEP — Vaccine Discovery, Automated",
+  title: "Vaccine Discovery, Automated",
   description: "AI-orchestrated epitope prediction pipeline. From pathogen to ranked vaccine candidates in hours.",
   icons: {
     icon: "/favicon.ico",
