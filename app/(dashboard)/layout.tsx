@@ -17,7 +17,7 @@ export default function DashboardLayout({
   const router = useRouter();
 
   useEffect(() => {
-    if (user) router.replace("/playground");
+    if (!loading && !user) router.replace("/login");
   }, [user, loading, router]);
 
   // Show spinner while auth resolves OR while waiting for redirect
