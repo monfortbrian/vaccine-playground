@@ -10,7 +10,7 @@ const jetMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
   title: "Kozi AI - Vaccine Target Discovery",
-  description: "AI-powered vaccine candidate identification pipeline.",
+  description: "AI-assisted vaccine candidate identification pipeline.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

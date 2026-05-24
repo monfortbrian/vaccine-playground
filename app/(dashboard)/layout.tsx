@@ -5,21 +5,26 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth-provider";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
-import { SessionGuard } from "@/components/session-guard"; // adjust path if needed
+import { SessionGuard } from "@/components/session-guard";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) router.push("/login");
+    // router.replace — not push — no history entry, no back-button loop
+    if (!loading && !user) router.replace("/login");
   }, [user, loading, router]);
 
   if (loading) {
     return (
       <div className="flex min-h-svh items-center justify-center">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <div className="h-5 w-5 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
       </div>
     );
   }
@@ -36,7 +41,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
-        {/* SessionGuard sits here, it renders nothing until session expires */}
         <SessionGuard />
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">

@@ -1,12 +1,5 @@
 "use client";
 
-/**
- * Login page - full viewport split layout.
- * Left: form. Right: pipeline diagram (dark panel).
- * No blue. Neutral Apple HIG palette.
- * All existing auth logic preserved exactly.
- */
-
 import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { IconFlask, IconEye, IconEyeOff } from "@tabler/icons-react";
@@ -17,73 +10,30 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/components/auth-provider";
 import { AccessDeniedModal } from "@/components/access-denied-modal";
 
-// ── Right panel - pipeline node diagram ──────────────────────────────────────
+// ── Left panel -image cover ──────────────────────────────────────────────────
 
-function PipelinePanel() {
-  const nodes = [
-    { id: "N1", label: "Data Curator", tool: "UniProt · NCBI" },
-    { id: "N2", label: "Antigen Screener", tool: "VaxiJen · Phobius" },
-    { id: "N3", label: "T-Cell Predictor", tool: "NetMHCpan · IEDB" },
-    { id: "N4", label: "B-Cell Predictor", tool: "BepiPred · ESM-2" },
-    { id: "N5", label: "Structure Agent", tool: "AlphaFold DB" },
-    { id: "N6", label: "Safety Filter", tool: "AllerTOP · BLAST" },
-    { id: "N7", label: "Coverage Agent", tool: "IEDB · AFND 2020" },
-    { id: "N8", label: "Construct Designer", tool: "ProtParam · RS09" },
-  ];
-
+function CoverPanel() {
   return (
-    <div className="relative hidden lg:flex lg:flex-col lg:justify-between bg-[#111113] h-full overflow-hidden px-12 py-14">
-      {/* Subtle dot grid */}
-      <div
-        className="absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
+    <div className="relative hidden lg:block">
+      {/* Replace /login-cover.jpg with your actual image in public/ */}
+      <img
+        src="/login-cover.jpg"
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover"
+        onError={(e) => {
+          // Fallback to dark panel if image missing
+          (e.target as HTMLImageElement).style.display = "none";
         }}
       />
+      {/* Dark overlay so any text or logo on top is legible */}
+      <div className="absolute inset-0 bg-black/40" />
 
-      {/* Wordmark */}
-      <div className="relative z-10 flex items-center gap-2.5">
-        <div className="flex size-7 items-center justify-center rounded-lg border border-white/10 bg-white/8">
-          <IconFlask className="size-4 text-white/70" />
-        </div>
-        <span className="text-sm font-semibold text-white/70 tracking-tight">
-          Kozi AI
-        </span>
-        <span className="ml-1 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] text-white/35 font-mono">
-          TOPE_DEEP v2
-        </span>
-      </div>
-
-      {/* Node list */}
-      <div className="relative z-10 space-y-3 my-auto">
-        {nodes.map((n, i) => (
-          <div key={n.id} className="flex items-center gap-4">
-            {/* Node pill */}
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5">
-              <span className="font-mono text-[10px] font-semibold text-white/50">
-                {n.id}
-              </span>
-            </div>
-            {/* Connector */}
-            {i < nodes.length - 1 && (
-              <div className="absolute ml-4 mt-8 w-px h-3 bg-white/10" />
-            )}
-            {/* Label */}
-            <div>
-              <p className="text-xs font-medium text-white/60">{n.label}</p>
-              <p className="text-[10px] text-white/25 font-mono">{n.tool}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Footer */}
-      <div className="relative z-10 space-y-1">
-        <p className="text-sm font-medium text-white/50 leading-relaxed">
+      {/* Wordmark over image */}
+      <div className="absolute bottom-10 left-10 z-10 space-y-1">
+        <p className="text-sm font-medium text-white/70 leading-relaxed">
           Pathogen proteome to ranked vaccine candidates.
         </p>
-        <p className="text-xs text-white/20">
+        <p className="text-xs text-white/30 font-mono">
           N1 → N8 · UniProt · AlphaFold · IEDB · NetMHCpan
         </p>
       </div>
@@ -107,8 +57,9 @@ function LoginForm() {
 
   const sessionExpired = searchParams.get("reason") === "expired";
 
+  // router.replace -not push -avoids adding to history stack, eliminates blink
   React.useEffect(() => {
-    if (user) router.push("/");
+    if (user) router.replace("/");
   }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -118,7 +69,7 @@ function LoginForm() {
     setLoading(true);
     try {
       await signIn(email, password);
-      router.push("/");
+      router.replace("/");   // replace not push
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Sign in failed";
       if (msg === "ACCESS_DENIED") {
@@ -141,7 +92,10 @@ function LoginForm() {
 
       <div className="flex min-h-svh lg:grid lg:grid-cols-2">
 
-        {/* ── Left: form ──────────────────────────────────────── */}
+        {/* ── Left: image cover ───────────────────────────── */}
+        <CoverPanel />
+
+        {/* ── Right: form ─────────────────────────────────── */}
         <div className="flex flex-col bg-background">
 
           {/* Top bar */}
@@ -152,7 +106,7 @@ function LoginForm() {
             <span className="text-sm font-semibold tracking-tight">Kozi AI</span>
           </div>
 
-          {/* Form */}
+          {/* Form centered vertically */}
           <div className="flex flex-1 items-center justify-center px-8 py-12">
             <div className="w-full max-w-[360px] space-y-8">
 
@@ -170,16 +124,19 @@ function LoginForm() {
                 <div className="flex items-start gap-3 rounded-xl border bg-muted/40 px-4 py-3">
                   <AlertCircle className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Your session ended. Pipeline results are preserved - find them in History after signing in.
+                    Your session ended. Pipeline results are preserved -find
+                    them in History after signing in.
                   </p>
                 </div>
               )}
 
               {/* Error */}
               {error && (
-                <div className="flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/8 px-4 py-3">
+                <div className="flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3">
                   <AlertCircle className="mt-0.5 size-4 shrink-0 text-destructive" />
-                  <p className="text-xs text-destructive leading-relaxed">{error}</p>
+                  <p className="text-xs text-destructive leading-relaxed">
+                    {error}
+                  </p>
                 </div>
               )}
 
@@ -189,11 +146,14 @@ function LoginForm() {
                     Email
                   </Label>
                   <Input
-                    id="email" type="email"
+                    id="email"
+                    type="email"
                     placeholder="researcher@institution.edu"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required autoComplete="email" className="h-10"
+                    required
+                    autoComplete="email"
+                    className="h-10"
                   />
                 </div>
 
@@ -216,7 +176,8 @@ function LoginForm() {
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      required autoComplete="current-password"
+                      required
+                      autoComplete="current-password"
                       className="h-10 pr-10"
                     />
                     <button
@@ -243,7 +204,9 @@ function LoginForm() {
                       <span className="size-4 rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground animate-spin" />
                       Signing in…
                     </span>
-                  ) : "Sign in"}
+                  ) : (
+                    "Sign in"
+                  )}
                 </Button>
               </form>
 
@@ -264,7 +227,8 @@ function LoginForm() {
                 <a
                   href="https://kozi-ai.com/contact"
                   className="font-medium text-foreground underline-offset-4 hover:underline transition-colors"
-                  target="_blank" rel="noopener noreferrer"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   Request access
                 </a>
@@ -276,17 +240,27 @@ function LoginForm() {
           <div className="px-8 pb-8">
             <p className="text-xs text-muted-foreground text-center">
               By signing in you agree to our{" "}
-              <a href="https://kozi-ai.com/terms" target="_blank" rel="noopener noreferrer"
-                className="underline underline-offset-4 hover:text-foreground">Terms</a>{" "}
+              <a
+                href="https://kozi-ai.com/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-4 hover:text-foreground"
+              >
+                Terms
+              </a>{" "}
               and{" "}
-              <a href="https://kozi-ai.com/privacy" target="_blank" rel="noopener noreferrer"
-                className="underline underline-offset-4 hover:text-foreground">Privacy Policy</a>.
+              <a
+                href="https://kozi-ai.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-4 hover:text-foreground"
+              >
+                Privacy Policy
+              </a>
+              .
             </p>
           </div>
         </div>
-
-        {/* ── Right: pipeline panel ──────────────────────────── */}
-        <PipelinePanel />
       </div>
     </>
   );
@@ -294,11 +268,13 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-svh items-center justify-center bg-background">
-        <div className="h-5 w-5 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex min-h-svh items-center justify-center bg-background">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
+        </div>
+      }
+    >
       <LoginForm />
     </Suspense>
   );
