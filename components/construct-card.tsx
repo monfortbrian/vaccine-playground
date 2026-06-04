@@ -211,7 +211,7 @@ export function ConstructCard({ report }: ConstructCardProps) {
         {report.limitations && report.limitations.length > 0 && (
           <div className="rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-50/50 dark:bg-amber-950/20 p-4 space-y-2">
             <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
-              Limitations - read before use
+              Limitations  read before use
             </p>
             <ul className="space-y-1">
               {report.limitations.map((l, i) => (
