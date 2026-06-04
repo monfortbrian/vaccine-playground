@@ -176,7 +176,18 @@ export default function ResultsPage() {
       </div>
 
       {/* ── N5 Structure card ───────────────────────────────────── */}
-      <StructureCard candidates={res.candidates} />
+      <StructureCard
+        structures={res.candidates.map((c) => ({
+          protein_name: c.protein_name,
+          protein_id: c.protein_id,
+          structure_source: c.structure_source ?? "unavailable",
+          structure_pdb_url: c.structure_pdb_url ?? undefined,
+          mean_plddt: c.decisions?.find((d: any) => d.stage === "structure_retrieval")?.mean_plddt,
+          model_version: c.decisions?.find((d: any) => d.stage === "structure_retrieval")?.model_version,
+          residue_range: c.decisions?.find((d: any) => d.stage === "structure_retrieval")?.fragment_coverage,
+          entry_id: c.decisions?.find((d: any) => d.stage === "structure_retrieval")?.alphafold_entry_id,
+        }))}
+      />
 
       {/* ── Coverage chart ─────────────────────────────────────── */}
       <CoverageChart coverageDetail={c.coverage_detail} />

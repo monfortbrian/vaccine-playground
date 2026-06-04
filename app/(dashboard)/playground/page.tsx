@@ -251,14 +251,14 @@ export default function PlaygroundPage() {
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <Label className="text-sm font-medium">Safety screening</Label>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">Allergenicity &amp; toxicity - N6</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">Allergenicity &amp; toxicity</p>
                   </div>
                   <Switch checked={runSafety} onCheckedChange={setRunSafety} disabled={running} />
                 </div>
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <Label className="text-sm font-medium">Population coverage</Label>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">HLA coverage across 7 populations - N7</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">HLA coverage across 7 populations</p>
                   </div>
                   <Switch checked={runCoverage} onCheckedChange={setRunCoverage} disabled={running} />
                 </div>
