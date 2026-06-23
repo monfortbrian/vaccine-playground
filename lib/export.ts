@@ -8,7 +8,10 @@
  * Naming: TD_{pathogen}_{datatype}_{YYYYMMDD}_{runId8}.{ext}
  */
 
+import { supabase } from "@/lib/supabase";
 import type { Candidate } from "@/types";
+
+const API = process.env.NEXT_PUBLIC_API_URL || "";
 
 function slugify(name: string | null | undefined): string {
   if (!name) return "unknown";
@@ -26,7 +29,7 @@ function buildFileName(
   candidates: Candidate[],
   runId: string,
   datatype: "epitopes" | "fullreport" | "construct" | "coverage",
-  ext: "csv" | "json"
+  ext: "csv" | "pdf"
 ): string {
   const source = candidates[0]?.protein_name || candidates[0]?.protein_id;
   return `TD_${slugify(source)}_${datatype}_${compactDate()}_${runId.slice(0, 8)}.${ext}`;
@@ -42,12 +45,7 @@ function dl(blob: Blob, name: string): void {
   URL.revokeObjectURL(a.href);
 }
 
-export function downloadJSON(data: unknown, runId: string, candidates: Candidate[]): void {
-  dl(
-    new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }),
-    buildFileName(candidates, runId, "fullreport", "json")
-  );
-}
+/* ── CSV ──────────────────────────────────────────────────────────────────── */
 
 export function downloadCSV(candidates: Candidate[], runId: string): void {
   const headers = [
@@ -62,7 +60,7 @@ export function downloadCSV(candidates: Candidate[], runId: string): void {
   const rows = candidates.flatMap((c) =>
     c.epitopes.map((e) => {
       const to = (e as any).tool_outputs ?? {};
-      const safetyMethod = Object.values(to.safety_method_used ?? {}).join("; ");
+      const safetyMethod  = Object.values(to.safety_method_used ?? {}).join("; ");
       const animalAlleles = (to.animal_model_alleles ?? []).join("; ");
       const mamuAlleles   = (to.mamu_alleles ?? []).join("; ");
 
@@ -94,11 +92,37 @@ export function downloadCSV(candidates: Candidate[], runId: string): void {
   dl(new Blob([csv], { type: "text/csv" }), buildFileName(candidates, runId, "epitopes", "csv"));
 }
 
+/* ── PDF full report ──────────────────────────────────────────────────────── */
+
+export async function downloadReportPDF(
+  runId: string,
+  candidates: Candidate[],
+): Promise<void> {
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+  if (!token) throw new Error("Not authenticated");
+
+  const resp = await fetch(`${API}/api/pipeline/report/${runId}`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => "");
+    throw new Error(`Report generation failed (${resp.status}): ${text.slice(0, 120)}`);
+  }
+
+  const blob = await resp.blob();
+  dl(blob, buildFileName(candidates, runId, "fullreport", "pdf"));
+}
+
+/* ── Shared filename builder (used by history page) ──────────────────────── */
+
 export function buildTDFileName(
   pathogenName: string | null | undefined,
   runId: string,
   datatype: "epitopes" | "fullreport" | "construct" | "coverage",
-  ext: "csv" | "json"
+  ext: "csv" | "pdf"
 ): string {
   return `TD_${slugify(pathogenName)}_${datatype}_${compactDate()}_${runId.slice(0, 8)}.${ext}`;
 }
