@@ -1,3 +1,5 @@
+"use client";
+
 import type {
   PipelineRunRequest,
   PipelineRunResponse,
@@ -12,7 +14,6 @@ const API = process.env.NEXT_PUBLIC_API_URL || '';
 async function getToken(): Promise<string | null> {
   const { data: { session } } = await supabase.auth.getSession();
   if (session?.access_token) return session.access_token;
-  // Session stale - force refresh
   const { data: refreshed } = await supabase.auth.refreshSession();
   return refreshed.session?.access_token ?? null;
 }
@@ -24,10 +25,7 @@ async function f<T>(url: string, opts?: RequestInit): Promise<T> {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
   try {
-    const r = await fetch(url, {
-      ...opts,
-      headers,
-    });
+    const r = await fetch(url, { ...opts, headers });
     if (!r.ok) throw new Error(`API returned ${r.status}: ${await r.text()}`);
     return r.json();
   } catch (err) {
@@ -53,14 +51,21 @@ export const api = {
 
   listRuns: async (): Promise<RunSummary[]> => {
     try {
-      const runs = await f<any[]>(`${API}/api/runs`);
-      return runs.map((r: any) => ({
-        id: r.run_id || r.id,
-        pathogen_name: r.input_value || null,
-        input_type: r.input_type || 'pathogen',
-        status: r.status,
-        created_at: r.started_at || r.created_at || '',
-        completed_at: r.completed_at || null,
+      // FIX 1: The backend returns RunListResponse { runs: [...], total, page, per_page, has_more }
+      // Previous code used f<any[]> treating the response as a flat array always returned empty.
+      // Now correctly typed as an object and we extract .runs before mapping.
+      const res = await f<{ runs: any[]; total: number }>(`${API}/api/runs`);
+
+      // FIX 2: Guard against null/undefined .runs in case backend returns partial response
+      const rows = Array.isArray(res?.runs) ? res.runs : [];
+
+      return rows.map((r: any) => ({
+        id:            r.run_id  || r.id,
+        pathogen_name: r.input_value || r.pathogen_name || null,
+        input_type:    r.input_type  || 'pathogen',
+        status:        r.status,
+        created_at:    r.started_at  || r.created_at  || '',
+        completed_at:  r.completed_at || null,
         global_coverage: r.global_coverage_pct ?? r.global_coverage ?? null,
       }));
     } catch {

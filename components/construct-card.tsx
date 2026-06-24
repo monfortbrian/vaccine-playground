@@ -198,7 +198,7 @@ export function ConstructCard({ report }: ConstructCardProps) {
                     key={junction}
                     className="flex items-center gap-1.5 rounded-full border px-3 py-1"
                   >
-                    <span className="text-[10px] text-muted-foreground">{junction.replace("_", "→")}</span>
+                    <span className="text-[10px] text-muted-foreground">{junction.replace("_", "-")}</span>
                     <code className="font-mono text-xs font-medium">{seq}</code>
                   </div>
                 ))}
@@ -216,7 +216,7 @@ export function ConstructCard({ report }: ConstructCardProps) {
             <ul className="space-y-1">
               {report.limitations.map((l, i) => (
                 <li key={i} className="flex items-start gap-2">
-                  <span className="text-amber-500 mt-0.5 shrink-0">–</span>
+                  <span className="text-amber-500 mt-0.5 shrink-0">-</span>
                   <p className="text-xs text-muted-foreground leading-relaxed">{l}</p>
                 </li>
               ))}
