@@ -202,7 +202,7 @@ function StructureEntry({ s }: { s: StructureResult }) {
               rel="noopener noreferrer"
               className="text-xs text-foreground underline underline-offset-4 hover:opacity-70 transition-opacity"
             >
-              Submit to ColabFold for de novo prediction →
+              Submit to ColabFold for de novo prediction
             </a>
           </div>
         </div>
@@ -245,7 +245,7 @@ export function StructureCard({ structures }: StructureCardProps) {
       {/* Footer */}
       <div className="px-6 py-4 border-t border-border bg-muted/20">
         <p className="text-[10px] text-muted-foreground leading-relaxed">
-          pLDDT: per-residue confidence (0–100).{" "}
+          pLDDT: per-residue confidence (0-100).{" "}
           ≥90 very high · ≥70 confident · ≥50 low · &lt;50 backbone unreliable.{" "}
           <a
             href="https://doi.org/10.1038/s41586-021-03819-2"
