@@ -8,7 +8,7 @@ export type PipelineStatus =
   | "paused"
   | "cancelled";
 
-export type PipelineNode = "N1" | "N2" | "N3" | "N4" | "N5" | "N6" | "N7" | "N8";
+export type PipelineNode = "N1" | "N2" | "N3" | "N4" | "N5" | "N6" | "N7" | "N8" | "N9" | "N10";
 
 export interface PipelineRunRequest {
   input_type: InputType;
@@ -48,7 +48,6 @@ export interface Epitope {
   confidence: "high" | "medium" | "low";
   allergenicity_safe: boolean | null;
   toxicity_safe: boolean | null;
-  // tool_outputs fields surfaced for export and display
   tool_outputs?: {
     method_used?: string;
     ic50_note?: string;
@@ -64,7 +63,6 @@ export interface Decision {
   stage: string;
   decision: string;
   reasoning: string;
-  // structure_retrieval
   mean_plddt?: number;
   plddt_field_used?: string;
   model_version?: string;
@@ -74,18 +72,14 @@ export interface Decision {
   cif_url?: string;
   pdb_url?: string;
   colabfold_hint?: string;
-  // antigen_screening
   vaxijen_score?: number;
   vaxijen_method?: string;
   phobius_localization?: string;
-  // construct_design
   construct_length?: number;
   adjuvant_used?: string;
   instability_index?: number;
   is_stable?: boolean;
-  // coverage
   per_population?: Record<string, CoverageDetail>;
-  // tcell
   ctl_method?: string;
   htl_method?: string;
   mouse_h2_reactive?: number;
@@ -105,7 +99,6 @@ export interface Physicochemical {
   error?: string;
 }
 
-// Adjuvant as nested object matches construct_designer_v2.py output
 export interface AdjuvantInfo {
   key: string;
   sequence: string;
@@ -120,15 +113,12 @@ export interface ConstructReport {
   length_aa: number;
   epitope_counts: { CTL: number; HTL: number; "B-cell": number };
   physicochemical: Physicochemical;
-  // Nested adjuvant object (v2 format)
   adjuvant: AdjuvantInfo;
-  // Legacy flat fields kept for backwards compatibility with old runs
   adjuvant_included?: boolean;
   adjuvant_sequence?: string;
   adjuvant_reference?: string;
   linker_scheme: Record<string, string>;
   linker_citation: string;
-  // Legacy linker_reference field
   linker_reference?: string;
   limitations: string[];
   next_steps: string[];
@@ -152,14 +142,11 @@ export interface Candidate {
   bcell_count: number;
   global_coverage_pct: number;
   african_coverage_pct: number;
-  // N5 structure fields
   structure_source?: string | null;
   structure_pdb_url?: string | null;
-  // N2 antigen screening
   phobius_localization?: string | null;
   vaxijen_score?: number | null;
   vaxijen_method?: string | null;
-  // Epitopes + decisions
   epitopes: Epitope[];
   decisions: Decision[];
   coverage_detail: Record<string, CoverageDetail> | null;
@@ -175,6 +162,8 @@ export interface PipelineTiming {
   n6_safety?: number;
   n7_coverage?: number;
   n8_construct?: number;
+  n9_literature?: number | null;
+  n10_experiment?: number | null;
 }
 
 export interface PipelineResults {
@@ -195,6 +184,10 @@ export interface RunSummary {
   epitope_count?: number;
   global_coverage?: number;
   has_construct?: boolean;
+  // NEW: size of serialized run data in bytes (estimated from candidates+epitopes)
+  size_bytes?: number | null;
+  // NEW: archived timestamp set when user archives, cleared on restore
+  archived_at?: string | null;
 }
 
 export interface NodeInfo {
@@ -206,60 +199,14 @@ export interface NodeInfo {
 }
 
 export const PIPELINE_NODES: NodeInfo[] = [
-  {
-    id: "N1",
-    label: "Data Curation",
-    description: "Fetch pathogen proteome from UniProt & NCBI",
-    shortDesc: "Proteome fetch",
-    tool: "UniProt · NCBI",
-  },
-  {
-    id: "N2",
-    label: "Antigen Screening",
-    description: "Identify surface-exposed antigenic proteins via Phobius and VaxiJen",
-    shortDesc: "Surface antigens",
-    tool: "VaxiJen · Phobius",
-  },
-  {
-    id: "N3",
-    label: "T-Cell Prediction",
-    description: "Predict CTL and HTL epitopes binding human HLA, mouse H-2, macaque Mamu",
-    shortDesc: "CTL / HTL epitopes",
-    tool: "NetMHCpan · IEDB",
-  },
-  {
-    id: "N4",
-    label: "B-Cell Prediction",
-    description: "Identify linear and conformational antibody-binding regions",
-    shortDesc: "Antibody epitopes",
-    tool: "BepiPred · ESM-2",
-  },
-  {
-    id: "N5",
-    label: "Structure Retrieval",
-    description: "Retrieve 3D protein structure from AlphaFold DB by UniProt accession",
-    shortDesc: "3D structure",
-    tool: "AlphaFold DB",
-  },
-  {
-    id: "N6",
-    label: "Safety Filter",
-    description: "FAO/WHO allergenicity, AllerTOP v2.0, HemoPI, FDA/EMA human homology",
-    shortDesc: "Safety checks",
-    tool: "AllerTOP · HemoPI",
-  },
-  {
-    id: "N7",
-    label: "Population Coverage",
-    description: "HLA coverage across global and African populations",
-    shortDesc: "HLA coverage",
-    tool: "IEDB · AFND 2020",
-  },
-  {
-    id: "N8",
-    label: "Construct Design",
-    description: "Multi-epitope construct with configurable adjuvant and ProtParam analysis",
-    shortDesc: "Final construct",
-    tool: "ProtParam · RS09",
-  },
+  { id: "N1",  label: "Data Curation",      description: "Fetch pathogen proteome from UniProt & NCBI",                                       shortDesc: "Proteome fetch",    tool: "UniProt · NCBI"         },
+  { id: "N2",  label: "Antigen Screening",   description: "Identify surface-exposed antigenic proteins via Phobius and VaxiJen",               shortDesc: "Surface antigens",  tool: "VaxiJen · Phobius"      },
+  { id: "N3",  label: "T-Cell Prediction",   description: "Predict CTL and HTL epitopes binding human HLA, mouse H-2, macaque Mamu",           shortDesc: "CTL / HTL epitopes",tool: "NetMHCpan · IEDB"       },
+  { id: "N4",  label: "B-Cell Prediction",   description: "Identify linear and conformational antibody-binding regions",                        shortDesc: "Antibody epitopes", tool: "BepiPred · ESM-2"       },
+  { id: "N5",  label: "Structure Retrieval", description: "Retrieve 3D protein structure from AlphaFold DB by UniProt accession",              shortDesc: "3D structure",      tool: "AlphaFold DB"           },
+  { id: "N6",  label: "Safety Filter",       description: "WHO allergenicity, AllerTOP v2.0, HemoPI, FDA/EMA human homology",                  shortDesc: "Safety checks",     tool: "AllerTOP · HemoPI"      },
+  { id: "N7",  label: "Population Coverage", description: "HLA coverage across global and African populations",                                 shortDesc: "HLA coverage",      tool: "IEDB · AFND 2020"       },
+  { id: "N8",  label: "Construct Design",    description: "Multi-epitope construct with configurable adjuvant and ProtParam analysis",          shortDesc: "Final construct",   tool: "ProtParam · RS09"       },
+  { id: "N9",  label: "Literature Agent",    description: "PubMed search + Qdrant semantic retrieval + Claude synthesis",                       shortDesc: "Literature",        tool: "PubMed · Qdrant"        },
+  { id: "N10", label: "Experiment Planner",  description: "AI-generated wet-lab validation roadmap",                                            shortDesc: "Wet-lab plan",      tool: "Anthropic Claude"             },
 ];
