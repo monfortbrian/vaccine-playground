@@ -2,17 +2,8 @@
 
 /**
  * PipelineAnimation
- *
- * Follows globals.css design system exactly:
- *   L1 text-foreground      active agent name
- *   L2 text-muted-foreground  idle/done agent name, log line
- *   L3 text-tertiary        tool names always
- *   No opacity modifiers on text. No /50, /60, /70.
- *   Font sizes: 16px agent name, 13px tool, 13px log
- *   Border: border-border only  no /40 /50 variants
- *
- * Panel header (title + subtitle) lives in playground/page.tsx.
- * This component owns the agent list body only.
+ * 14px Geist regular throughout — no medium weight, no tool name secrets.
+ * Agent labels: plain scientific names, no tool stack revealed.
  */
 
 import React from "react";
@@ -21,19 +12,17 @@ import { Check, AlertTriangle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { AgentId, PipelineStatus } from "@/types";
 
-/* ── Agent registry ─────────────────────────────────────────────────────────── */
-
-const AGENTS: { id: AgentId; label: string; tool: string }[] = [
-  { id: "N1",  label: "Sequence Ingestor",     tool: "UniProt · NCBI"           },
-  { id: "N2",  label: "Antigenicity Screener", tool: "VaxiJen 2.0 · Phobius"    },
-  { id: "N3",  label: "MHC Binding Predictor", tool: "NetMHCpan 4.1 · IEDB"     },
-  { id: "N4",  label: "Linear Epitope Mapper", tool: "BepiPred 2.0 · ESM-2"     },
-  { id: "N5",  label: "Structural Resolver",   tool: "AlphaFold DB · EBI"       },
-  { id: "N6",  label: "Immunosafety Filter",   tool: "AllerTOP · HemoPI"        },
-  { id: "N7",  label: "Population Coverage",   tool: "IEDB · AFND 2020"         },
-  { id: "N8",  label: "Construct Assembler",   tool: "ProtParam · RS09 · PADRE" },
-  { id: "N9",  label: "Evidence Retriever",    tool: "PubMed · Qdrant · Anthropic Claude" },
-  { id: "N10", label: "Validation Roadmap",    tool: "Anthropic Claude"               },
+const AGENTS: { id: AgentId; label: string; short: string }[] = [
+  { id: "N1",  label: "Sequence Ingestor",     short: "Data validation"     },
+  { id: "N2",  label: "Antigenicity Screener", short: "Antigen scoring"     },
+  { id: "N3",  label: "MHC Binding Predictor", short: "T-cell prediction"   },
+  { id: "N4",  label: "Linear Epitope Mapper", short: "B-cell prediction"   },
+  { id: "N5",  label: "Structural Resolver",   short: "3D structure"        },
+  { id: "N6",  label: "Immunosafety Filter",   short: "Safety screening"    },
+  { id: "N7",  label: "Population Coverage",   short: "HLA analysis"        },
+  { id: "N8",  label: "Construct Assembler",   short: "Construct design"    },
+  { id: "N9",  label: "Evidence Retriever",    short: "Literature search"   },
+  { id: "N10", label: "Validation Roadmap",    short: "Experiment planning" },
 ];
 
 const ORDER = AGENTS.map(a => a.id);
@@ -59,10 +48,7 @@ function toAgentId(node: string | null | undefined): AgentId | null {
 
 type NodeState = "waiting" | "active" | "done" | "error";
 
-function resolveStates(
-  current: AgentId | null,
-  status: string | undefined,
-): NodeState[] {
+function resolveStates(current: AgentId | null, status: string | undefined): NodeState[] {
   return ORDER.map(id => {
     if (status === "completed") return "done";
     if (!current || status === "pending") return "waiting";
@@ -78,8 +64,6 @@ function trunc(s: string, max = 120) {
   return s.length > max ? s.slice(0, max - 1) + "…" : s;
 }
 
-/* ── Right-side indicator ───────────────────────────────────────────────────── */
-
 function StateIndicator({ state }: { state: NodeState }) {
   if (state === "done") {
     return (
@@ -90,10 +74,8 @@ function StateIndicator({ state }: { state: NodeState }) {
   }
   if (state === "error") {
     return (
-      <div
-        className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 border border-destructive"
-        style={{ background: "var(--signal-red-bg)" }}
-      >
+      <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 border border-destructive"
+        style={{ background: "var(--signal-red-bg)" }}>
         <AlertTriangle size={10} className="text-destructive" />
       </div>
     );
@@ -104,66 +86,43 @@ function StateIndicator({ state }: { state: NodeState }) {
   return <div className="w-4 h-4 flex-shrink-0" />;
 }
 
-/* ── Single agent row ───────────────────────────────────────────────────────── */
-
 function AgentRow({
-  label,
-  tool,
-  state,
-  logLine,
-  isIdle,
+  label, short, state, logLine, isIdle,
 }: {
-  label: string;
-  tool: string;
-  state: NodeState;
-  logLine?: string;
-  isIdle?: boolean;
+  label: string; short: string; state: NodeState; logLine?: string; isIdle?: boolean;
 }) {
   const isActive  = state === "active";
   const isDone    = state === "done";
   const isError   = state === "error";
-  const isWaiting = state === "waiting";
 
   return (
-    <div
-      className={cn(
-        "flex items-center gap-3 px-4 rounded-lg border transition-colors",
-        // height: active row is taller to fit log line
-        isActive ? "py-3" : "py-2.5",
-        // borders only border-border, no opacity variants
-        isActive  && "border-border bg-card",
-        isDone    && "border-border bg-transparent",
-        isError   && "border-destructive bg-transparent",
-        isWaiting && "border-border bg-transparent",
-        isIdle    && "border-border bg-transparent",
-      )}
-    >
-      {/* Left: label + tool + log line */}
+    <div className={cn(
+      "flex items-center gap-3 px-4 rounded-lg border transition-colors",
+      isActive ? "py-3" : "py-2.5",
+      isActive  && "border-border bg-card",
+      isDone    && "border-border bg-transparent",
+      isError   && "border-destructive bg-transparent",
+      !isActive && !isDone && !isError && "border-border bg-transparent",
+    )}>
       <div className="flex-1 min-w-0">
-
-        {/* Agent name + tool on same line */}
         <div className="flex items-baseline gap-3 min-w-0">
-          <span
-            className={cn(
-              // 16px / 500 section header weight per design system
-              "text-base font-medium leading-tight shrink-0",
-              // L1 for active and error, L2 for done and waiting
-              isActive  && "text-foreground",
-              isDone    && "text-muted-foreground",
-              isWaiting && "text-muted-foreground",
-              isIdle    && "text-muted-foreground",
-              isError   && "text-destructive",
-            )}
-          >
+          {/* 14px Geist regular — agent name */}
+          <span className={cn(
+            "leading-tight shrink-0",
+            "text-[14px] font-normal",
+            isActive  && "text-foreground",
+            isDone    && "text-muted-foreground",
+            isError   && "text-destructive",
+            !isActive && !isDone && !isError && "text-muted-foreground",
+          )}>
             {label}
           </span>
-          {/* L3 tool name  text-tertiary, 13px mono, explicit per CSS */}
-          <span className="text-sm font-mono text-tertiary leading-tight truncate">
-            {tool}
+          {/* 13px Geist Mono regular — short descriptor, no secrets */}
+          <span className="text-[13px] font-normal font-mono text-tertiary leading-tight truncate">
+            {short}
           </span>
         </div>
 
-        {/* Live log line  L2 color, 13px mono, fades on change */}
         {isActive && logLine && (
           <AnimatePresence mode="wait">
             <motion.p
@@ -172,7 +131,7 @@ function AgentRow({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -2 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="text-sm font-mono text-muted-foreground mt-1.5 leading-relaxed"
+              className="text-[13px] font-normal font-mono text-muted-foreground mt-1.5 leading-relaxed"
             >
               {logLine}
             </motion.p>
@@ -180,13 +139,10 @@ function AgentRow({
         )}
       </div>
 
-      {/* Right: state indicator hidden in idle */}
       {!isIdle && <StateIndicator state={state} />}
     </div>
   );
 }
-
-/* ── Public component ───────────────────────────────────────────────────────── */
 
 export interface PipelineAnimationProps {
   currentNode?: string | null;
@@ -194,11 +150,7 @@ export interface PipelineAnimationProps {
   message?: string | null;
 }
 
-export function PipelineAnimation({
-  currentNode,
-  status,
-  message,
-}: PipelineAnimationProps) {
+export function PipelineAnimation({ currentNode, status, message }: PipelineAnimationProps) {
   const isIdle  = !status || status === "idle";
   const current = toAgentId(currentNode);
   const states  = isIdle
@@ -212,7 +164,7 @@ export function PipelineAnimation({
         <AgentRow
           key={agent.id}
           label={agent.label}
-          tool={agent.tool}
+          short={agent.short}
           state={states[i]}
           logLine={logLine}
           isIdle={isIdle}
