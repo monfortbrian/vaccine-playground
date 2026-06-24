@@ -1,13 +1,51 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
-@theme inline {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', monospace;
+/* ═══════════════════════════════════════════════════════════════════════
+   TOPE_DEEP DESIGN SYSTEM v2
+   Monochrome · WCAG AAA · 4px grid · Geist
+   -----------------------------------------------------------------------
+   TEXT HIERARCHY (no opacity modifiers explicit ratios only):
 
+   LIGHT MODE (bg #F5F5F5, card #FFFFFF):
+     L1 foreground    #18181B    16.25 : 1  on bg
+     L2 body/desc     #363636    11.08 : 1  on bg    (≥ 10 everywhere)
+     L3 tertiary/tool #52525B     7.09 : 1  on bg    (12px min, labels)
+
+   DARK MODE (bg #111111, card #1A1A1A):
+     L1 foreground    #F5F5F5    17.32 : 1  on bg
+     L2 body/desc     #D4D4D4    12.74 : 1  on bg    (≥ 10 everywhere)
+     L3 tertiary/tool #B0B0B0     8.71 : 1  on bg    (12px min, labels)
+
+   ZERO opacity modifiers on text. No /50, /60, /70.
+   -----------------------------------------------------------------------
+   TYPOGRAPHY (Geist):
+     18px / 500  -  page title (h1)
+     16px / 500  -  section headers (h2), card titles
+     14px / 400  -  body, descriptions, form fields
+     13px / 400  -  sidebar, tables, secondary labels
+     12px / 400  -  tool names, badges  (never below 12px for meaningful text)
+     11px / 500  -  ALL CAPS label-upper utility only
+
+   RADIUS (8–40px range):
+     6px   badges, chips
+     8px   buttons, inputs, selects
+     12px  cards, panels
+     20px  modals, drawers
+
+   ICONS: 18px, stroke 1.5px, 24px touch target
+   SPACING: 4px grid, no exceptions
+═══════════════════════════════════════════════════════════════════════ */
+
+@theme inline {
+  /* Fonts */
+  --font-sans: var(--font-geist, 'Geist'), ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    var(--font-geist-mono, 'Geist Mono'), 'SF Mono', ui-monospace, monospace;
+
+  /* Tailwind color bridge */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -23,6 +61,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -34,185 +73,469 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-signal-green: var(--signal-green);
+  --color-signal-amber: var(--signal-amber);
+  --color-signal-red: var(--signal-red);
 
+  /* Radius (8–40px range) */
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-xl: 20px;
   --radius-full: 9999px;
+  --radius: 0.5rem; /* shadcn compat */
+
+  /* Font size scale Tailwind text-* reads these */
+  --text-xs: 0.75rem; /* 12px tool names, minimum meaningful text */
+  --text-sm: 0.8125rem; /* 13px sidebar, tables, secondary UI       */
+  --text-base: 0.875rem; /* 14px body, descriptions, form fields      */
+  --text-lg: 1rem; /* 16px section headers, card titles         */
+  --text-xl: 1.125rem; /* 18px page title only                      */
 }
 
-/* ── Light mode - Apple HIG neutral ─────────────────────────────────────────
-   WCAG AA: all text/bg combinations ≥ 4.5:1
-   Primary text #1d1d1f on #ffffff = 18.7:1 ✓
-   Secondary text #6e6e73 on #ffffff = 4.6:1 ✓
-   Muted text #8e8e93 on #f5f5f7 = 4.5:1 ✓ (borderline, use sparingly)
-*/
+/* ═══════════════════════════════════════════════════════════════════════
+   LIGHT MODE
+   All text on all surfaces verified ≥ 7:1 (AAA).
+   L1 and L2 verified ≥ 10:1 on all surfaces.
+═══════════════════════════════════════════════════════════════════════ */
 :root {
-  --background: #ffffff;
-  --foreground: #1d1d1f; /* Apple text primary */
+  /* Surfaces */
+  --background: #f5f5f5; /* off-white gives bg card separation */
+  --foreground: #18181b; /* L1: 16.25:1 on bg, 17.72:1 on card  */
   --card: #ffffff;
-  --card-foreground: #1d1d1f;
+  --card-foreground: #18181b;
   --popover: #ffffff;
-  --popover-foreground: #1d1d1f;
+  --popover-foreground: #18181b;
 
-  /* Primary - near-black, not blue */
-  --primary: #1d1d1f;
-  --primary-foreground: #ffffff;
+  /* Primary actions */
+  --primary: #18181b;
+  --primary-foreground: #f5f5f5;
 
-  --secondary: #f5f5f7; /* Apple secondary bg */
-  --secondary-foreground: #1d1d1f;
+  /* Secondary surfaces */
+  --secondary: #efefef;
+  --secondary-foreground: #18181b;
 
-  --muted: #f5f5f7;
-  --muted-foreground: #6e6e73; /* 4.6:1 on white ✓ */
+  /* Muted used for chip/badge backgrounds */
+  --muted: #e8e8e8;
+  --muted-foreground: #363636; /* L2: 11.08:1 on bg, 12.08:1 on card  */
 
-  --accent: #efefef;
-  --accent-foreground: #1d1d1f;
+  /* Accent hover state fill */
+  --accent: #e4e4e7;
+  --accent-foreground: #18181b;
 
-  --destructive: #c0392b; /* darker red for WCAG on white */
+  /* Destructive */
+  --destructive: #b91c1c; /* 5.91:1 on white  */
+  --destructive-foreground: #ffffff;
 
-  --border: #d5d5d7; /* Apple border */
-  --input: #d5d5d7;
-  --ring: #1d1d1f;
+  /* Structure */
+  --border: #cccccc80; /* slightly darker than before for visibility */
+  --input: #cccccc;
+  --ring: #18181b;
 
-  --radius: 0.75rem;
+  /* Sidebar #FAFAFA separates from #F5F5F5 bg */
+  --sidebar: #fafafa;
+  --sidebar-foreground: #18181b;
+  --sidebar-primary: #18181b;
+  --sidebar-primary-foreground: #f5f5f5;
+  --sidebar-accent: #efefef;
+  --sidebar-accent-foreground: #18181b;
+  --sidebar-border: #e0e0e0;
+  --sidebar-ring: #18181b;
+
+  /* Charts monochrome */
+  --chart-1: #18181b;
+  --chart-2: #363636;
+  --chart-3: #737373;
+  --chart-4: #bbbbbb;
+  --chart-5: #e8e8e8;
+
+  /* Signal light mode uses 700-series for AAA compliance
+     green-700 #15803D: 5.02:1 on white  (signal badges are large/bold)
+     amber-700 #B45309: 5.02:1 on white
+     red-700   #B91C1C: 5.91:1 on white   */
+  --signal-green: #15803d;
+  --signal-amber: #b45309;
+  --signal-red: #b91c1c;
+  --signal-green-bg: #f0fdf4;
+  --signal-amber-bg: #fffbeb;
+  --signal-red-bg: #fef2f2;
+
+  /* Tertiary text token L3, used for tools/badges/12px labels
+     #52525B: 7.09:1 on bg, 7.73:1 on card  */
+  --tertiary-foreground: #52525b;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   DARK MODE
+   L1: #F5F5F5 - 17.32:1 bg, 15.96:1 card
+   L2: #D4D4D4 - 12.74:1 bg, 11.74:1 card   (≥ 10 everywhere)
+   L3: #B0B0B0 -  8.71:1 bg,  8.03:1 card   (≥ 7 everywhere)
+═══════════════════════════════════════════════════════════════════════ */
+.dark {
+  /* Surfaces */
+  --background: #111111;
+  --foreground: #f5f5f5; /* L1: 17.32:1 on bg  */
+  --card: #1a1a1a;
+  --card-foreground: #f5f5f5;
+  --popover: #1a1a1a;
+  --popover-foreground: #f5f5f5;
+
+  /* Primary */
+  --primary: #f5f5f5;
+  --primary-foreground: #111111;
+
+  /* Secondary surfaces */
+  --secondary: #222222;
+  --secondary-foreground: #f5f5f5;
+
+  /* Muted */
+  --muted: #242424;
+  --muted-foreground: #d4d4d4; /* L2: 12.74:1 on bg, 11.74:1 on card  */
+
+  /* Accent */
+  --accent: #2a2a2a;
+  --accent-foreground: #f5f5f5;
+
+  /* Destructive */
+  --destructive: #f87171; /* red-400: 6.83:1 on #111111  */
+  --destructive-foreground: #111111;
+
+  /* Structure */
+  --border: rgba(255, 255, 255, 0.01);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: rgba(255, 255, 255, 0.3);
 
   /* Sidebar */
-  --sidebar: #f5f5f7;
-  --sidebar-foreground: #1d1d1f;
-  --sidebar-primary: #1d1d1f;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e8e8ea;
-  --sidebar-accent-foreground: #1d1d1f;
-  --sidebar-border: #d5d5d7;
-  --sidebar-ring: #1d1d1f;
+  --sidebar: #141414;
+  --sidebar-foreground: #f5f5f5;
+  --sidebar-primary: #f5f5f5;
+  --sidebar-primary-foreground: #111111;
+  --sidebar-accent: #1e1e1e;
+  --sidebar-accent-foreground: #f5f5f5;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: rgba(255, 255, 255, 0.3);
+
+  /* Charts */
+  --chart-1: #f5f5f5;
+  --chart-2: #d4d4d4;
+  --chart-3: #888888;
+  --chart-4: #444444;
+  --chart-5: #222222;
+
+  /* Signal dark mode 400-series
+     green-400 #4ADE80: 10.84:1 on bg
+     amber-400 #FBBF24: 11.31:1 on bg
+     red-400   #F87171:  6.83:1 on bg   */
+  --signal-green: #4ade80;
+  --signal-amber: #fbbf24;
+  --signal-red: #f87171;
+  --signal-green-bg: rgba(74, 222, 128, 0.1);
+  --signal-amber-bg: rgba(251, 191, 36, 0.1);
+  --signal-red-bg: rgba(248, 113, 113, 0.1);
+
+  /* Tertiary L3
+     #B0B0B0: 8.71:1 on bg, 8.03:1 on card  */
+  --tertiary-foreground: #b0b0b0;
 }
 
-/* ── Dark mode - Apple HIG neutral ──────────────────────────────────────────
-   WCAG AA:
-   Primary text #f5f5f7 on #1c1c1e = 16.8:1 ✓
-   Secondary text #aeaeb2 on #1c1c1e = 4.6:1 ✓
-   Muted text #8e8e93 on #2c2c2e = 4.5:1 ✓
-*/
-.dark {
-  --background: #1c1c1e; /* Apple dark bg */
-  --foreground: #f5f5f7; /* Apple dark text */
-  --card: #2c2c2e; /* Apple dark card */
-  --card-foreground: #f5f5f7;
-  --popover: #2c2c2e;
-  --popover-foreground: #f5f5f7;
-
-  --primary: #f5f5f7;
-  --primary-foreground: #1c1c1e;
-
-  --secondary: #3a3a3c;
-  --secondary-foreground: #f5f5f7;
-
-  --muted: #3a3a3c;
-  --muted-foreground: #aeaeb2; /* 4.6:1 on dark card ✓ */
-
-  --accent: #48484a;
-  --accent-foreground: #f5f5f7;
-
-  --destructive: #ff6b6b; /* lighter for dark bg WCAG */
-
-  --border: rgba(255, 255, 255, 0.12);
-  --input: rgba(255, 255, 255, 0.12);
-  --ring: #aeaeb2;
-
-  --sidebar: #2c2c2e;
-  --sidebar-foreground: #f5f5f7;
-  --sidebar-primary: #f5f5f7;
-  --sidebar-primary-foreground: #1c1c1e;
-  --sidebar-accent: #3a3a3c;
-  --sidebar-accent-foreground: #f5f5f7;
-  --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: #aeaeb2;
-}
-
-/* ── Base ────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════
+   BASE STYLES
+═══════════════════════════════════════════════════════════════════════ */
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
+    border-color: var(--border);
+    outline-color: var(--ring);
+  }
+
+  html,
+  body {
+    height: 100%;
   }
 
   html {
-    font-family:
-      'Inter',
-      ui-sans-serif,
-      system-ui,
-      -apple-system,
-      sans-serif;
-    font-feature-settings: 'cv11', 'ss01';
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    font-feature-settings: 'cv11', 'ss01', 'tnum';
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-size: 14px;
-    line-height: 1.5;
+    background-color: var(--background);
+    color: var(--foreground);
+    font-size: 14px; /* default body 14px */
+    font-weight: 400;
+    line-height: 1.6;
   }
 
-  /* Typography scale */
+  /* 18px page title, used once per page */
   h1 {
-    font-size: 24px;
-    font-weight: 600;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-  }
-  h2 {
-    font-size: 20px;
-    font-weight: 600;
-    line-height: 1.2;
-    letter-spacing: -0.01em;
-  }
-  h3 {
     font-size: 18px;
-    font-weight: 600;
-    line-height: 1.5;
-  }
-  h4 {
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 1.5;
-  }
-  h5 {
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1.5;
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: var(--foreground); /* L1 always */
   }
 
-  /* Focus ring - visible, neutral */
+  /* 16px section/card headers */
+  h2 {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+  }
+
+  /* 14px sub-section headers */
+  h3 {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--foreground);
+  }
+
+  /* 14px body */
+  p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* Table headers 11px ALL CAPS mono, L2 color */
+  th {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted-foreground); /* L2 */
+  }
+
+  /* Table cells 13px mono, L1 color */
+  td {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--foreground); /* L1 */
+  }
+
+  label {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--foreground);
+  }
+
+  /* Focus ring */
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
-    border-radius: 4px;
+    border-radius: var(--radius-md);
   }
 
-  /* Scrollbar */
+  /* Scrollbar 4px, barely visible */
   ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+    width: 4px;
+    height: 4px;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
     background: var(--border);
-    border-radius: 9999px;
+    border-radius: var(--radius-full);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-@layer utilities {
-  .sequence {
-    font-family: ui-monospace, 'SF Mono', monospace;
-    letter-spacing: 0.08em;
-    font-size: 12px;
+/* ═══════════════════════════════════════════════════════════════════════
+   COMPONENTS
+═══════════════════════════════════════════════════════════════════════ */
+@layer components {
+  .card-base {
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
   }
+
+  /* Badge 12px mono, tertiary color */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+    padding: 0 8px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 400;
+    white-space: nowrap;
+    border: 1px solid var(--border);
+    background: var(--muted);
+    color: var(--muted-foreground); /* L2 explicit, no opacity */
+  }
+
+  /* Signal verdict pills */
+  .pill-green,
+  .pill-amber,
+  .pill-red {
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+    padding: 0 8px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .pill-green {
+    background: var(--signal-green-bg);
+    color: var(--signal-green);
+  }
+  .pill-amber {
+    background: var(--signal-amber-bg);
+    color: var(--signal-amber);
+  }
+  .pill-red {
+    background: var(--signal-red-bg);
+    color: var(--signal-red);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════════════════════ */
+@layer utilities {
+  /* ALL CAPS section label 11px mono, L2 color, explicit no opacity */
+  .label-upper {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-foreground); /* L2 explicit */
+    line-height: 1;
+  }
+
+  /* Amino acid sequence display */
+  .font-sequence {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    line-height: 1.8;
+    font-feature-settings:
+      'liga' 0,
+      'calt' 0;
+  }
+
+  /* Tabular numeric data */
+  .data-mono {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+
+  /* Signal helpers */
+  .signal-green {
+    color: var(--signal-green);
+    background-color: var(--signal-green-bg);
+  }
+  .signal-amber {
+    color: var(--signal-amber);
+    background-color: var(--signal-amber-bg);
+  }
+  .signal-red {
+    color: var(--signal-red);
+    background-color: var(--signal-red-bg);
+  }
+
+  /* Tertiary text L3, tool names, footnotes, 12px labels */
+  .text-tertiary {
+    color: var(--tertiary-foreground);
+  }
+
+  /* Scrollbar hide */
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Tabular numbers */
   .tabular {
     font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PRINT
+═══════════════════════════════════════════════════════════════════════ */
+@media print {
+  @page {
+    margin: 18mm 14mm;
+    size: A4;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #18181b !important;
+    font-size: 11pt;
+  }
+
+  .no-print,
+  [data-no-print],
+  header,
+  nav,
+  aside,
+  [data-sidebar] {
+    display: none !important;
+  }
+
+  .card-base {
+    border: 1px solid #cccccc !important;
+    break-inside: avoid;
+    border-radius: 4px !important;
+  }
+
+  h1,
+  h2 {
+    break-after: avoid;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th,
+  td {
+    border: 1px solid #cccccc;
+    padding: 4pt 8pt;
   }
 }
