@@ -51,7 +51,7 @@ export function AccessDeniedModal({ onClose }: { onClose: () => void }) {
               <li>• You&apos;re trying to enter the playground, love that</li>
               <li>• No stress, we got you</li>
               <li>• Ping the CEO directly (yes, he reads them)</li>
-              <li>• Get approved → jump right in 🚀</li>
+              <li>• Get approved, jump right in 🚀</li>
             </ul>
           </div>
 

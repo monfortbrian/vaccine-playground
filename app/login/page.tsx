@@ -69,8 +69,8 @@ function LoginForm() {
     try {
       await signIn(email, password);
       // Do NOT call router.replace here.
-      // signIn() triggers Supabase onAuthStateChange → auth-provider sets user
-      // → useEffect above fires → router.replace("/") runs cleanly.
+      // signIn() triggers Supabase onAuthStateChange, auth-provider sets user
+      // useEffect above fires router.replace("/") runs cleanly.
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Sign in failed";
       if (msg === "ACCESS_DENIED") {
